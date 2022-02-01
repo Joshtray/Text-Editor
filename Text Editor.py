@@ -3,7 +3,9 @@ class TextEditor:
         self.cursor = 0 
         self.clipboard = [] 
         self.text = "" 
+        self.undo_count = 0
         self.selected = [0, -1] 
+        self.state_array = []
 
     def __repr__(self): 
         return self.text 
@@ -17,7 +19,8 @@ class TextEditor:
             self.cursor = self.selected[0]
             self.selected = [0, -1]
             self.type_text(text)
-        print(self.text) 
+        print(self.text)
+        self.state_array.append(self.text) 
     
     def select(self, start, end): 
         self.selected[0] = start 
@@ -61,10 +64,30 @@ class TextEditor:
             self.selected = [0, -1]
             self.type_text(self.clipboard[-steps_back])
         print(self.text)
+        self.state_array.append(self.text) 
         
     def delete(self): 
         if self.selected != [0, -1]: 
             self.text = self.text[:self.selected[0]] + self.text[self.selected[1] + 1:]
+        self.state_array.append(self.text) 
+    
+    def undo(self):
+        self.undo_count+=1
+        self.text = self.state_array[-1-self.undo_count]
+        self.move_cursor(len(self.text)-len(self.state_array[-1-self.undo_count+1]))
+    
+    def redo(self):
+        if self.undo_count > 0:
+            self.undo_count -= 1
+            self.text = self.state_array[-1-self.undo_count]
+            self.move_cursor(len(self.text)-len(self.state_array[-1-self.undo_count-1]))
+        
+    def cut(self):
+        self.copy()
+        self.delete()
+        
+    
+        
             
 def implementTextEditor2(operations): 
     text = TextEditor() 
