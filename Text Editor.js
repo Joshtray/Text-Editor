@@ -4,6 +4,8 @@ class TextEditor {
         this.clipboard = [] 
         this.text = "" 
         this.selected = [0, -1] 
+        this.undo_count = 0
+        this.state_array = []
     }
 
 
@@ -82,6 +84,23 @@ class TextEditor {
             this.text = this.text.slice(0, this.selected[0]) + this.text.slice(this.selected[1] + 1)
         }
     }
+
+    undo() {
+        this.undo_count += 1
+        this.text = this.state_array[this.state_array.length-1-this.undo_count]
+        this.move_cursor(this.text.length-this.state_array[this.state_array.length-1-this.undo_count+1].length)
+    }
+    redo() {
+        if (this.undo_count > 0) {
+            this.undo_count -= 1
+            this.text = this.state_array[this.state_array.length-1-this.undo_count]
+            this.move_cursor(this.text.length-this.state_array[this.state_array.length-1-this.undo_count-1].length)
+        }
+    }
+    cut() {
+        this.copy()
+        this.delete()
+    }
 }
 
 const implementTextEditor2 = (operations) => {
@@ -100,7 +119,18 @@ const implementTextEditor2 = (operations) => {
             text.move_cursor(parseInt(operation.split(" ")[1])) 
         }
         else if (operation[0] == "C") {
-            text.copy() 
+            if (operation[1] == "O") {
+                text.copy()
+            }
+            else if (operation[1] = "U") {
+                text.cut()
+            }
+        }
+        else if (operation[0] = "U") {
+            text.undo()
+        }
+        else if (operation[0] = "R") {
+            text.redo()
         }
         else if (operation[0] == "P") { 
             if (operation.length == 5){ 
@@ -115,6 +145,5 @@ const implementTextEditor2 = (operations) => {
 
 }
 
-// const operations = ["TYPE I am a boy", "SELECT 0 3", "COPY", "TYPE Not", "MOVE_CURSOR 9", "TYPE  ", "PASTE", "PASTE", "TYPE . My name is Jessey Uche-Nwichi"]
 const operations = ["TYPE I am a boy", "SELECT 0 3", "COPY", "TYPE Not", "MOVE_CURSOR 9", "TYPE  ", "PASTE", "PASTE", "TYPE . My name is Jessey Uche-Nwichi"]
 console.log("Text: |" + implementTextEditor2(operations).text + "|")
