@@ -87,4 +87,4 @@ def implementTextEditor2(operations):
 
 
 operations = ["TYPE I am a boy", "SELECT 0 3", "COPY", "TYPE Not", "MOVE_CURSOR 9", "TYPE  ", "PASTE", "PASTE", "TYPE . My name is Jessey Uche-Nwichi"]
-implementTextEditor2(operations).selected
+print("Text: |" + implementTextEditor2(operations).text + "|")
