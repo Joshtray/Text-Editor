@@ -21,7 +21,8 @@ class TextEditor {
             this.selected = [0, -1]
             this.type_text(text)
         }
-        console.log(this.text) 
+        console.log(this.text)
+        this.state_array.push(this.text) 
     }
 
     select(start, end) {
@@ -78,23 +79,46 @@ class TextEditor {
         }
         console.log("Current clipboard", this.clipboard)
         console.log(this.text)
+        this.state_array.push(this.text) 
     }
     delete() { 
         if (this.selected[0] != 0 || this.selected[1] != -1) { 
             this.text = this.text.slice(0, this.selected[0]) + this.text.slice(this.selected[1] + 1)
         }
+        this.state_array.push(this.text) 
     }
 
     undo() {
-        this.undo_count += 1
-        this.text = this.state_array[this.state_array.length-1-this.undo_count]
-        this.move_cursor(this.text.length-this.state_array[this.state_array.length-1-this.undo_count+1].length)
+        console.log(this.state_array)
+        if (this.state_array.length != 0) {
+            this.undo_count += 1
+            console.log(this.state_array.length, this.undo_count)
+            if (this.state_array.length == this.undo_count) {
+                this.text = ""
+            }
+            else {
+                this.text = this.state_array[this.state_array.length-1-this.undo_count]
+            }
+            if (this.text) {
+                this.move_cursor(this.text.length-this.state_array[this.state_array.length-1-this.undo_count+1].length)
+            }
+            else {
+                this.cursor = 0
+            }
+        }
     }
     redo() {
+        console.log(this.state_array)
         if (this.undo_count > 0) {
             this.undo_count -= 1
             this.text = this.state_array[this.state_array.length-1-this.undo_count]
-            this.move_cursor(this.text.length-this.state_array[this.state_array.length-1-this.undo_count-1].length)
+            console.log(this.text)
+            if (this.state_array.length == this.undo_count + 1) {
+                this.cursor = this.text.length
+            }
+            else {
+                this.move_cursor(this.text.length-this.state_array[this.state_array.length-1-this.undo_count-1].length)
+            }
         }
     }
     cut() {
@@ -122,14 +146,14 @@ const implementTextEditor2 = (operations) => {
             if (operation[1] == "O") {
                 text.copy()
             }
-            else if (operation[1] = "U") {
+            else if (operation[1] == "U") {
                 text.cut()
             }
         }
-        else if (operation[0] = "U") {
+        else if (operation[0] == "U") {
             text.undo()
         }
-        else if (operation[0] = "R") {
+        else if (operation[0] == "R") {
             text.redo()
         }
         else if (operation[0] == "P") { 
@@ -145,5 +169,5 @@ const implementTextEditor2 = (operations) => {
 
 }
 
-const operations = ["TYPE I am a boy", "SELECT 0 3", "COPY", "TYPE Not", "MOVE_CURSOR 9", "TYPE  ", "PASTE", "PASTE", "TYPE . My name is Jessey Uche-Nwichi"]
+const operations = ["TYPE I am a boy", "SELECT 0 3", "COPY", "TYPE Not", "MOVE_CURSOR 9", "TYPE  ", "PASTE", "PASTE", "TYPE . My name is Jessey Uche-Nwichi", "UNDO", "REDO", "UNDO", "UNDO", "UNDO", "UNDO", "UNDO", "UNDO", "UNDO", "REDO"]
 console.log("Text: |" + implementTextEditor2(operations).text + "|")
